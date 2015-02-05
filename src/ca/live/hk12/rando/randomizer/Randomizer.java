@@ -36,6 +36,7 @@ public class Randomizer implements ActionListener {
 		
 		readQuestions();
 		createWindow("Randomizer", 700, 400);
+		setNextQuestion();
 		
 		System.out.println("Author:\tHaris Khan\nDate:\tFeb/2014\nGitHub:\thttp://github.com/Haris1112/");
 		System.out.println("Website:\thttp://HappyHaris.com/");
@@ -52,7 +53,7 @@ public class Randomizer implements ActionListener {
 	
 	public void createWindow(String title, int width, int height) {
 		frame = new JFrame(title);
-		questionLabel = new JLabel("Tell me about yourself.");
+		questionLabel = new JLabel("Loading...");
 		randomButton = new JButton("Random Question");
 		
 		frame.setSize(width, height);
