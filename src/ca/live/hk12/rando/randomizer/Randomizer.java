@@ -18,7 +18,11 @@ import javax.swing.JLabel;
 public class Randomizer implements ActionListener {
 	
 	private String fileName;
+	private static final String delimiter = "~";
+	private static final String defDelimiter = "_";
 	
+	private int fQi = 0;
+	private ArrayList<String> firstQuestions;
 	private ArrayList<String> questions;
 	
 	private JFrame frame;
@@ -27,6 +31,7 @@ public class Randomizer implements ActionListener {
 	
 	public Randomizer(String fileName) {
 		this.fileName = fileName;
+		firstQuestions = new ArrayList<String>();
 		questions = new ArrayList<String>();
 		
 		readQuestions();
@@ -35,6 +40,11 @@ public class Randomizer implements ActionListener {
 		System.out.println("Author:\tHaris Khan\nDate:\tFeb/2014\nGitHub:\thttp://github.com/Haris1112/");
 		System.out.println("Website:\thttp://HappyHaris.com/");
 		System.out.println("\n The following data was loaded:");
+		System.out.println("First Questions to ask:===");
+		for(String s : firstQuestions) {
+			System.out.println(s);
+		}
+		System.out.println("\nOther Questions:===");
 		for(String s : questions) {
 			System.out.println(s);
 		}
@@ -42,7 +52,7 @@ public class Randomizer implements ActionListener {
 	
 	public void createWindow(String title, int width, int height) {
 		frame = new JFrame(title);
-		questionLabel = new JLabel("Loading...");
+		questionLabel = new JLabel("Tell me about yourself.");
 		randomButton = new JButton("Random Question");
 		
 		frame.setSize(width, height);
@@ -54,6 +64,7 @@ public class Randomizer implements ActionListener {
 		
 		randomButton.addActionListener(this);
 		randomButton.setActionCommand("randomize");
+		randomButton.setFont(new Font("Serif", Font.PLAIN, 25 ));
 		
 		questionLabel.setFont(new Font("Serif", Font.PLAIN, 25 ));
 		
@@ -65,11 +76,27 @@ public class Randomizer implements ActionListener {
 		File f = new File(fileName);
 		try {
 			Scanner sc = new Scanner(f);
+			boolean defQs = false;
+			while(sc.hasNextLine()) {
+				String s = sc.nextLine().trim();
+				if(s.equals(defDelimiter))
+					defQs = true;
+			}
+			sc.close();
+			sc = new Scanner(f);
+			if(defQs) {
+				while(sc.hasNextLine()) {
+					String s = sc.nextLine().trim();
+					if(s.equals(defDelimiter))
+						break;
+					firstQuestions.add(s);
+				}
+			}
 			while(sc.hasNextLine()) {
 				String s = sc.nextLine().trim();
 				int num = 1;
-				if(s.contains(",")) {
-					String[] st = s.split(",");
+				if(s.contains("~")) {
+					String[] st = s.split(delimiter);
 					num = Integer.parseInt(st[1].trim());
 					s = st[0].trim();
 				}
@@ -86,10 +113,22 @@ public class Randomizer implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		if(event.getActionCommand().equals("randomize")) {
-			questionLabel.setText("<html>" + getRandomQuestion() + "</html>");
+			setNextQuestion();
 		}
 	}
+	
+	private void setQuestion(String question) {
+		questionLabel.setText("<html>" + question + "</html>");
+	}
 
+	private void setNextQuestion() {
+		if(fQi < firstQuestions.size()) {
+			setQuestion(firstQuestions.get(fQi++));
+		} else {
+			setQuestion(getRandomQuestion());
+		}
+	}
+	
 	private String getRandomQuestion() {
 		Random r = new Random();
 		int x = r.nextInt(questions.size());
